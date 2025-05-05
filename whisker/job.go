@@ -15,6 +15,7 @@ type Job struct {
 
 type Result struct {
 	Output    []string
+	Error     string
 	Success   bool
 	StartedAt time.Time
 	EndedAt   time.Time
@@ -30,6 +31,18 @@ func ProcessJob(job *Job, workflow *Workflow) *Result {
 
 		if tokens[0] == "echo" {
 			result.Output = append(result.Output, tokens[1])
+		} else if tokens[0] == "run" {
+			// TODO: implement run command
+			result.Output = append(result.Output, "TBD")
+		} else {
+			errMsg := "Error: unsupported action in step: " + step
+
+			result.Error = errMsg
+			result.Success = false
+			result.EndedAt = time.Now()
+
+			log.Println(errMsg)
+			return result
 		}
 	}
 
