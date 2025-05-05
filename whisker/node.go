@@ -5,15 +5,15 @@ import (
 )
 
 type NodeState struct {
-	NodeName string
-	Busy     bool
+	NodeName  string
+	Busy      bool
 	Workflows []*Workflow
 }
 
 func NewNode() *NodeState {
 	return &NodeState{
-		NodeName: "Node",
-		Busy:     false,
+		NodeName:  GetConfig().NodeName,
+		Busy:      false,
 		Workflows: loadWorkflows(),
 	}
 }
