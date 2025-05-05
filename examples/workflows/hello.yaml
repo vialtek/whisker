@@ -1,0 +1,5 @@
+name: Hello World Workflow
+description: This is simple workflow that just say hello. 
+workflow: hello
+steps:
+  - echo "Hello world from workflow."

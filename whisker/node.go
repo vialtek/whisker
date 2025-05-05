@@ -7,12 +7,14 @@ import (
 type NodeState struct {
 	NodeName string
 	Busy     bool
+	Workflows []*Workflow
 }
 
 func NewNode() *NodeState {
 	return &NodeState{
 		NodeName: "Node",
 		Busy:     false,
+		Workflows: loadWorkflows(),
 	}
 }
 
