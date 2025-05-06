@@ -8,6 +8,7 @@ type NodeState struct {
 	NodeName  string
 	Busy      bool
 	Workflows []*Workflow
+	Datasets  []*Dataset
 }
 
 func NewNode() *NodeState {
@@ -15,6 +16,7 @@ func NewNode() *NodeState {
 		NodeName:  GetConfig().NodeName,
 		Busy:      false,
 		Workflows: loadWorkflows(),
+		Datasets:  loadDatasets(),
 	}
 }
 

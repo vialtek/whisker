@@ -11,6 +11,7 @@ import (
 type Config struct {
 	NodeName        string `yaml:"nodeName"`
 	WorkflowDirPath string `yaml:"workflowDirPath"`
+	DatasetDirPath  string `yaml:"datasetDirPath"`
 }
 
 var configInstance *Config
@@ -76,5 +77,6 @@ func defaultConfig() *Config {
 	return &Config{
 		NodeName:        "New Node",
 		WorkflowDirPath: "./examples/workflows",
+		DatasetDirPath:  "./examples/datasets",
 	}
 }
