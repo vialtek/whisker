@@ -27,11 +27,11 @@ post '/heartbeat' do
 end
 
 get '/jobs' do
-  json available_jobs
+  json available_jobs.select { it[:status] == :waiting }
 end
 
-get '/jobs/waiting' do
-  json available_jobs.select { it[:status] == :waiting }
+get '/jobs/all' do
+  json available_jobs
 end
 
 get '/jobs/:guid' do
