@@ -13,10 +13,10 @@ func webShellEndpoint() string {
 	return "http://localhost:4567"
 }
 
-func SendHeartbeat(payload map[string]string) {
+func SendHeartbeat(status map[string]string) {
 	log.Println("Remote: sending heartbeat to " + webShellEndpoint())
 
-	json_data, err := json.Marshal(payload)
+	json_data, err := json.Marshal(status)
 	if err != nil {
 		log.Println("Error: SendHeartbeat marshal -", err)
 		return

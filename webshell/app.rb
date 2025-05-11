@@ -24,8 +24,8 @@ end
 
 post '/heartbeat' do
   params = JSON.parse(request.body.read, symbolize_names: true)
-  puts "------"
   puts params
+
   json status: 'ok'
 end
 

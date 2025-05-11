@@ -28,25 +28,25 @@ func NewNode() *NodeState {
 func (s *NodeState) Run() {
 	log.Println("Whisker is running!")
 
-	remote.SendHeartbeat(nodeStatus(s))
+	remote.SendHeartbeat(s.Status())
 	heartbeatTicker := time.NewTicker(1 * time.Minute)
 
 	for {
 		select {
 		case <-heartbeatTicker.C:
-			remote.SendHeartbeat(nodeStatus(s))
+			remote.SendHeartbeat(s.Status())
 		}
 	}
 }
 
-func nodeStatus(state *NodeState) map[string]string {
+func (s *NodeState) Status() map[string]string {
 	result := make(map[string]string)
 
-	result["node_name"] = state.NodeName
-	result["busy"] = strconv.FormatBool(state.Busy)
+	result["node_name"] = s.NodeName
+	result["busy"] = strconv.FormatBool(s.Busy)
 
 	var workflowNames []string
-	for _, wf := range state.Workflows {
+	for _, wf := range s.Workflows {
 		if wf != nil {
 			workflowNames = append(workflowNames, wf.Workflow)
 		}
@@ -54,7 +54,7 @@ func nodeStatus(state *NodeState) map[string]string {
 	result["workflows"] = strings.Join(workflowNames, ",")
 
 	var datasetNames []string
-	for _, ds := range state.Datasets {
+	for _, ds := range s.Datasets {
 		if ds != nil {
 			datasetNames = append(datasetNames, ds.Name)
 		}
