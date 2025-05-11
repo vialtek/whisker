@@ -6,14 +6,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/vialtek/whisker/model"
 	"github.com/vialtek/whisker/remote"
 )
 
 type NodeState struct {
 	NodeName  string
 	Busy      bool
-	Workflows []*Workflow
-	Datasets  []*Dataset
+	Workflows []*model.Workflow
+	Datasets  []*model.Dataset
 }
 
 func NewNode() *NodeState {

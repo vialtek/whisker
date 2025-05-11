@@ -4,15 +4,9 @@ import (
 	"log"
 	"time"
 
+	"github.com/vialtek/whisker/model"
 	"github.com/vialtek/whisker/utils"
 )
-
-type Job struct {
-	Guid     string `json:"guid"`
-	Dataset  string `json:"dataset"`
-	Workflow string `json:"workflow"`
-	Status   string `json:"status"`
-}
 
 type Result struct {
 	Output    []string
@@ -22,7 +16,7 @@ type Result struct {
 	EndedAt   time.Time
 }
 
-func ProcessJob(job *Job, workflow *Workflow) *Result {
+func ProcessJob(job *model.Job, workflow *model.Workflow) *Result {
 	log.Println("Starting job:", job.Guid)
 
 	result := &Result{StartedAt: time.Now()}

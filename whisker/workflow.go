@@ -6,17 +6,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/vialtek/whisker/model"
 )
 
-type Workflow struct {
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Workflow    string   `yaml:"workflow"`
-	Steps       []string `yaml:"steps"`
-}
-
-func loadWorkflows() []*Workflow {
-	var workflows []*Workflow
+func loadWorkflows() []*model.Workflow {
+	var workflows []*model.Workflow
 	log.Println("Loading workflows...")
 
 	for _, path := range findInDirectory(GetConfig().WorkflowDirPath, ".yaml") {
@@ -31,13 +26,13 @@ func loadWorkflows() []*Workflow {
 	return workflows
 }
 
-func parseWorkflowYaml(path string) *Workflow {
+func parseWorkflowYaml(path string) *model.Workflow {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		log.Printf("parseWorkflowYaml could not open file:", err)
 	}
 
-	newWorkflow := &Workflow{}
+	newWorkflow := &model.Workflow{}
 	err = yaml.Unmarshal(yamlFile, newWorkflow)
 	if err != nil {
 		log.Fatalf("parseWorkflowYaml could not unmarshal:", err)

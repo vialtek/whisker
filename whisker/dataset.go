@@ -4,20 +4,18 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/vialtek/whisker/model"
 )
 
-type Dataset struct {
-	Name string
-}
-
-func loadDatasets() []*Dataset {
-	var datasets []*Dataset
+func loadDatasets() []*model.Dataset {
+	var datasets []*model.Dataset
 
 	entries, err := os.ReadDir(GetConfig().DatasetDirPath)
 	if err == nil {
 		for _, entry := range entries {
 			if entry.IsDir() && !strings.HasPrefix(entry.Name(), ".") {
-				datasets = append(datasets, &Dataset{Name: entry.Name()})
+				datasets = append(datasets, &model.Dataset{Name: entry.Name()})
 			}
 		}
 	}

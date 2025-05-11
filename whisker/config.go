@@ -6,19 +6,15 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/vialtek/whisker/model"
 )
 
-type Config struct {
-	NodeName        string `yaml:"nodeName"`
-	WorkflowDirPath string `yaml:"workflowDirPath"`
-	DatasetDirPath  string `yaml:"datasetDirPath"`
-}
+var configInstance *model.Config
 
-var configInstance *Config
-
-func GetConfig() *Config {
+func GetConfig() *model.Config {
 	if configInstance == nil {
-		configInstance = configInstance.parseConfig()
+		configInstance = parseConfig()
 
 		if configInstance == nil {
 			log.Println("Warning: config file not found, using default config attributes.")
@@ -29,7 +25,8 @@ func GetConfig() *Config {
 	return configInstance
 }
 
-func (c *Config) parseConfig() *Config {
+func parseConfig() *model.Config {
+	var config *model.Config
 	log.Println("Loading config file...")
 
 	configFilePath := getConfigFilePath()
@@ -43,13 +40,13 @@ func (c *Config) parseConfig() *Config {
 		return nil
 	}
 
-	err = yaml.Unmarshal(yamlFile, &c)
+	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
 		log.Fatalf("Error: yamlFile Config Unmarshal: %v", err)
 		return nil
 	}
 
-	return c
+	return config
 }
 
 func getConfigFilePath() string {
@@ -73,8 +70,8 @@ func getConfigFilePath() string {
 	return ""
 }
 
-func defaultConfig() *Config {
-	return &Config{
+func defaultConfig() *model.Config {
+	return &model.Config{
 		NodeName:        "New Node",
 		WorkflowDirPath: "./examples/workflows",
 		DatasetDirPath:  "./examples/datasets",
