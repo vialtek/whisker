@@ -7,13 +7,13 @@ available_jobs = [
     {
       guid: SecureRandom.uuid.gsub('-','').downcase,
       workflow: 'hello',
-      dataset: '',
+      dataset: 'beer',
       status: :waiting
     },
     {
       guid: SecureRandom.uuid.gsub('-','').downcase,
       workflow: 'hello',
-      dataset: '',
+      dataset: 'beer',
       status: :waiting
     }
   ]
