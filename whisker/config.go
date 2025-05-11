@@ -25,6 +25,7 @@ func GetConfig() *model.Config {
 	return configInstance
 }
 
+// FIXME: unmarshaled config should merge with default config to keep required fields present
 func parseConfig() *model.Config {
 	var config *model.Config
 	log.Println("Loading config file...")
@@ -72,9 +73,11 @@ func getConfigFilePath() string {
 
 func defaultConfig() *model.Config {
 	return &model.Config{
-		NodeName:        "New Node",
-		WorkflowDirPath: "./examples/workflows",
-		DatasetDirPath:  "./examples/datasets",
-		JobServerURL:    "http://localhost:4567",
+		NodeName:          "New Node",
+		WorkflowDirPath:   "./examples/workflows",
+		DatasetDirPath:    "./examples/datasets",
+		JobServerURL:      "http://localhost:4567",
+		HeartbeatInterval: 60,
+		JobFetchInterval:  1,
 	}
 }

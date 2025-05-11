@@ -38,9 +38,8 @@ func (s *NodeState) Init() {
 func (s *NodeState) Run() {
 	log.Println("Whisker is running!")
 
-	// TODO: move time to config
-	checkWorkTicker := time.NewTicker(5 * time.Second)
-	heartbeatTicker := time.NewTicker(60 * time.Second)
+	checkWorkTicker := time.NewTicker(time.Duration(GetConfig().JobFetchInterval) * time.Second)
+	heartbeatTicker := time.NewTicker(time.Duration(GetConfig().HeartbeatInterval) * time.Second)
 
 	for {
 		select {
