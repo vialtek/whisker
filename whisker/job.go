@@ -17,26 +17,38 @@ type Result struct {
 	EndedAt   time.Time
 }
 
-func (s *NodeState) loadJobs() {
+func (s *NodeState) pickNewJob() *model.Job {
 	if s.Busy {
-		return
+		return nil
 	}
 
-	// TODO: make singleton
 	client := remote.NewClient(GetConfig().JobServerURL)
 	jobs := client.AvailableJobs()
 
-	if len(jobs) == 0 {
-		return
+	for _, job := range jobs {
+		// TODO: we should also check the dataset
+		if s.workflowByName(job.Workflow) != nil && s.datasetByName(job.Dataset) != nil {
+			return job
+		}
 	}
 
-	// TODO: pick job to be executed
+	return nil
 }
 
-func ProcessJob(job *model.Job, workflow *model.Workflow) *Result {
-	log.Println("Starting job:", job.Guid)
-
+func (s *NodeState) executeJob(job *model.Job) *Result {
 	result := &Result{StartedAt: time.Now()}
+
+	workflow := s.workflowByName(job.Workflow)
+	if workflow == nil {
+		errMsg := "Error: workflow not found."
+
+		result.Error = errMsg
+		result.Success = false
+		result.EndedAt = time.Now()
+
+		log.Println(errMsg)
+		return result
+	}
 
 	for _, step := range workflow.Steps {
 		tokens := utils.TokenizeStep(step)

@@ -10,6 +10,16 @@ import (
 	"github.com/vialtek/whisker/model"
 )
 
+func (s *NodeState) workflowByName(workflowName string) *model.Workflow {
+	for _, workflow := range s.Workflows {
+		if workflow.Workflow == workflowName {
+			return workflow
+		}
+	}
+
+	return nil
+}
+
 func loadWorkflows() []*model.Workflow {
 	var workflows []*model.Workflow
 	log.Println("Loading workflows...")

@@ -39,17 +39,37 @@ func (s *NodeState) Run() {
 	log.Println("Whisker is running!")
 
 	// TODO: move time to config
-	heartbeatTicker := time.NewTicker(1 * time.Minute)
-	availableJobsTicker := time.NewTicker(5 * time.Second)
+	checkWorkTicker := time.NewTicker(5 * time.Second)
+	heartbeatTicker := time.NewTicker(60 * time.Second)
 
 	for {
 		select {
-		case <-availableJobsTicker.C:
-			s.loadJobs()
+		case <-checkWorkTicker.C:
+			s.manageWorkload()
 		case <-heartbeatTicker.C:
 			client.SendHeartbeat(s.Status())
 		}
 	}
+}
+
+func (s *NodeState) manageWorkload() {
+	if s.Busy {
+		return
+	}
+
+	job := s.pickNewJob()
+	if job == nil {
+		return
+	}
+
+	// TODO: async
+	s.Busy = true
+	log.Println("Starting job:", job.Guid)
+	result := s.executeJob(job)
+	s.Busy = false
+
+	elapsed := result.EndedAt.Sub(result.StartedAt)
+	log.Println("Job ended. Elapsed time:", elapsed)
 }
 
 func (s *NodeState) Status() map[string]string {
