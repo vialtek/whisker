@@ -75,5 +75,6 @@ func defaultConfig() *model.Config {
 		NodeName:        "New Node",
 		WorkflowDirPath: "./examples/workflows",
 		DatasetDirPath:  "./examples/datasets",
+		JobServerURL:    "http://localhost:4567",
 	}
 }

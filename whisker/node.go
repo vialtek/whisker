@@ -10,6 +10,8 @@ import (
 	"github.com/vialtek/whisker/remote"
 )
 
+var client *remote.Client
+
 type NodeState struct {
 	NodeName  string
 	Busy      bool
@@ -26,16 +28,22 @@ func NewNode() *NodeState {
 	}
 }
 
+func (s *NodeState) Init() {
+	log.Println("Initializing Whisker...")
+
+	client := remote.NewClient(GetConfig().JobServerURL)
+	client.SendHeartbeat(s.Status())
+}
+
 func (s *NodeState) Run() {
 	log.Println("Whisker is running!")
 
-	remote.SendHeartbeat(s.Status())
 	heartbeatTicker := time.NewTicker(1 * time.Minute)
 
 	for {
 		select {
 		case <-heartbeatTicker.C:
-			remote.SendHeartbeat(s.Status())
+			client.SendHeartbeat(s.Status())
 		}
 	}
 }

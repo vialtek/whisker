@@ -8,13 +8,10 @@ import (
 	"net/http"
 )
 
-// TODO: load dynamically
-func webShellEndpoint() string {
-	return "http://localhost:4567"
-}
+func (c *Client) SendHeartbeat(status map[string]string) {
+	url := c.BaseURL + "/heartbeat"
 
-func SendHeartbeat(status map[string]string) {
-	log.Println("Remote: sending heartbeat to " + webShellEndpoint())
+	log.Println("Remote: sending heartbeat to " + url)
 
 	json_data, err := json.Marshal(status)
 	if err != nil {
@@ -22,7 +19,7 @@ func SendHeartbeat(status map[string]string) {
 		return
 	}
 
-	resp, err := http.Post(webShellEndpoint()+"/heartbeat", "application/json", bytes.NewBuffer(json_data))
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(json_data))
 	if err != nil {
 		log.Println("Error: SendHeartbeat -", err)
 		return

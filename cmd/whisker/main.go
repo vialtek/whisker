@@ -10,5 +10,6 @@ func main() {
 	log.Println("Whisker is starting...")
 
 	whisker := whisker.NewNode()
+	whisker.Init()
 	whisker.Run()
 }
