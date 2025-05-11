@@ -38,10 +38,14 @@ func (s *NodeState) Init() {
 func (s *NodeState) Run() {
 	log.Println("Whisker is running!")
 
+	// TODO: move time to config
 	heartbeatTicker := time.NewTicker(1 * time.Minute)
+	availableJobsTicker := time.NewTicker(5 * time.Second)
 
 	for {
 		select {
+		case <-availableJobsTicker.C:
+			s.loadJobs()
 		case <-heartbeatTicker.C:
 			client.SendHeartbeat(s.Status())
 		}

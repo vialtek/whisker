@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/vialtek/whisker/model"
+	"github.com/vialtek/whisker/remote"
 	"github.com/vialtek/whisker/utils"
 )
 
@@ -14,6 +15,22 @@ type Result struct {
 	Success   bool
 	StartedAt time.Time
 	EndedAt   time.Time
+}
+
+func (s *NodeState) loadJobs() {
+	if s.Busy {
+		return
+	}
+
+	// TODO: make singleton
+	client := remote.NewClient(GetConfig().JobServerURL)
+	jobs := client.AvailableJobs()
+
+	if len(jobs) == 0 {
+		return
+	}
+
+	// TODO: pick job to be executed
 }
 
 func ProcessJob(job *model.Job, workflow *model.Workflow) *Result {
