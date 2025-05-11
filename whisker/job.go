@@ -26,7 +26,6 @@ func (s *NodeState) pickNewJob() *model.Job {
 	jobs := client.AvailableJobs()
 
 	for _, job := range jobs {
-		// TODO: we should also check the dataset
 		if s.workflowByName(job.Workflow) != nil && s.datasetByName(job.Dataset) != nil {
 			return job
 		}
