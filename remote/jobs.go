@@ -10,21 +10,23 @@ import (
 )
 
 func (c *Client) AvailableJobs() []*model.Job {
-	jobs := []*model.Job{}
-	log.Println("Remote: getting list of jobs")
+	url := c.BaseURL + "/jobs"
+	log.Println("Remote: get available jobs at " + url)
 
-	resp, err := http.Get(c.BaseURL + "/jobs")
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Println("Error: AvailableJobs -", err)
 		return nil
 	}
 	defer resp.Body.Close()
 
+	jobs := []*model.Job{}
 	body, err := io.ReadAll(resp.Body)
 	if err := json.Unmarshal(body, &jobs); err != nil {
 		log.Println("Error: AvailableJobs unmarshal -", err)
 		return nil
 	}
 
+	log.Println("Jobs in queue:", len(jobs))
 	return jobs
 }
