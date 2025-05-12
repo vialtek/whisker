@@ -1,6 +1,7 @@
 package whisker
 
 import (
+	"errors"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
@@ -15,60 +16,48 @@ var configInstance *model.Config
 func GetConfig() *model.Config {
 	if configInstance == nil {
 		configInstance = parseConfig()
-
-		if configInstance == nil {
-			log.Println("Warning: config file not found, using default config attributes.")
-			configInstance = defaultConfig()
-		}
 	}
 
 	return configInstance
 }
 
-// FIXME: unmarshaled config should merge with default config to keep required fields present
 func parseConfig() *model.Config {
-	var config *model.Config
 	log.Println("Loading config file...")
+	config := defaultConfig()
 
-	configFilePath := getConfigFilePath()
-	if configFilePath == "" {
-		return nil
+	configFilePath, err := getConfigFilePath()
+	if err != nil {
+		log.Println(err)
+		return config
 	}
 
 	yamlFile, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		log.Fatalf("Error: yamlFile Config file read: %v", err)
-		return nil
+		log.Println("Error: parseConfig - yamlFile Config file read: %v", err)
+		return config
 	}
 
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		log.Fatalf("Error: yamlFile Config Unmarshal: %v", err)
-		return nil
+		log.Println("Error: parseConfig - yamlFile Config Unmarshal: %v", err)
+		return config
 	}
 
 	return config
 }
 
-func getConfigFilePath() string {
-	ex, _ := os.Executable()
-	localConfigPath := filepath.Dir(ex) + "/config.yaml"
+func getConfigFilePath() (string, error) {
+	localConfigPath := filepath.Join(filepath.Dir(os.Args[0]), "config.yaml")
 	globalConfigPath := "/etc/whisker/config.yaml"
 
-	_, err := os.Stat(localConfigPath)
-	if err == nil {
-		log.Println("Using config on: ", localConfigPath)
-		return localConfigPath
+	for _, path := range []string{localConfigPath, globalConfigPath} {
+		if _, err := os.Stat(path); err == nil {
+			log.Println("Using config at:", path)
+			return path, nil
+		}
 	}
 
-	_, glob_err := os.Stat(globalConfigPath)
-	if glob_err == nil {
-		log.Println("Using config on:", globalConfigPath)
-		return globalConfigPath
-	}
-
-	// TODO: should return error when not found
-	return ""
+	return "", errors.New("No config file not found, using default configuration")
 }
 
 func defaultConfig() *model.Config {
