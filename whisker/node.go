@@ -64,6 +64,10 @@ func (s *NodeState) manageWorkload() {
 	// TODO: async
 	s.Busy = true
 	log.Println("Starting job:", job.Guid)
+
+	client := remote.NewClient(GetConfig().JobServerURL)
+	client.AcceptJob(job.Guid)
+
 	result := s.executeJob(job)
 	s.Busy = false
 

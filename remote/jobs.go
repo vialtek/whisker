@@ -2,6 +2,7 @@ package remote
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -29,4 +30,23 @@ func (c *Client) AvailableJobs() []*model.Job {
 
 	log.Println("Jobs in queue:", len(jobs))
 	return jobs
+}
+
+func (c *Client) AcceptJob(guid string) {
+	url := fmt.Sprintf("%s/jobs/%s/accept", c.BaseURL, guid)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println("ERROR: AcceptJob -", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error: AcceptJob reading response -", err)
+		return
+	}
+
+	log.Println("AcceptJob response: " + string(body))
 }
