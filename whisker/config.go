@@ -33,13 +33,13 @@ func parseConfig() *model.Config {
 
 	yamlFile, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		log.Println("Error: parseConfig - yamlFile Config file read: %v", err)
+		log.Println("Error: parseConfig - yamlFile Config file read:", err)
 		return config
 	}
 
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		log.Println("Error: parseConfig - yamlFile Config Unmarshal: %v", err)
+		log.Println("Error: parseConfig - yamlFile Config Unmarshal:", err)
 		return config
 	}
 
