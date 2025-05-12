@@ -69,6 +69,8 @@ func (s *NodeState) manageWorkload() {
 	client.AcceptJob(job.Guid)
 
 	result := s.executeJob(job)
+	client.SendJobOutput(job.Guid, result.Output)
+
 	s.Busy = false
 
 	elapsed := result.EndedAt.Sub(result.StartedAt)

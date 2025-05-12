@@ -1,6 +1,7 @@
 package remote
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -49,4 +50,34 @@ func (c *Client) AcceptJob(guid string) {
 	}
 
 	log.Println("AcceptJob response: " + string(body))
+}
+
+func (c *Client) SendJobOutput(guid string, output []string) {
+	url := fmt.Sprintf("%s/jobs/%s/output_log", c.BaseURL, guid)
+
+	payload := map[string][]string{
+		"output_log": output,
+	}
+
+	log.Println("Remote: sending output log to " + url)
+	json_data, err := json.Marshal(payload)
+	if err != nil {
+		log.Println("Error: SendJobOutput marshal -", err)
+		return
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(json_data))
+	if err != nil {
+		log.Println("Error: SendJobOutput -", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error: SendJobOutput reading response -", err)
+		return
+	}
+
+	log.Println("Heartbeat SendJobOutput: " + string(body))
 }

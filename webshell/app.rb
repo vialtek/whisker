@@ -51,3 +51,13 @@ get '/jobs/:guid/accept' do
   job[:status] = :in_progress
   return json status: 'ok'
 end
+
+post '/jobs/:guid/output_log' do
+  job = available_jobs.detect { it[:guid] == params['guid']}
+  return json status: 'not_found' if job == nil
+
+  params = JSON.parse(request.body.read, symbolize_names: true)
+  job[:output_log] = params[:output_log]
+
+  return json status: 'ok'
+end
