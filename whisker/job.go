@@ -18,13 +18,10 @@ type Result struct {
 }
 
 func (s *NodeState) pickNewJob() *model.Job {
-	if s.Busy {
-		return nil
-	}
-
 	client := remote.NewClient(GetConfig().JobServerURL)
 	jobs := client.AvailableJobs()
 
+	// Finds first job that require workflow and dataset available on our node
 	for _, job := range jobs {
 		if s.workflowByName(job.Workflow) != nil && s.datasetByName(job.Dataset) != nil {
 			return job
