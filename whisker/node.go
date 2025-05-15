@@ -66,15 +66,15 @@ func (s *NodeState) manageWorkload() {
 	log.Println("Starting job:", job.Guid)
 
 	client := remote.NewClient(GetConfig().JobServerURL)
-	client.AcceptJob(job.Guid)
+	client.ChangeJobState(job.Guid, "accept")
 
 	result := s.executeJob(job)
 	client.SendJobOutput(job.Guid, result.Output)
 
 	if result.Success {
-		client.FinishedJob(job.Guid)
+		client.ChangeJobState(job.Guid, "finished")
 	} else {
-		client.FailedJob(job.Guid)
+		client.ChangeJobState(job.Guid, "failed")
 	}
 
 	s.Busy = false

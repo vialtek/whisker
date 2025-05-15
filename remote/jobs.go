@@ -33,74 +33,28 @@ func (c *Client) AvailableJobs() []*model.Job {
 	return jobs
 }
 
-func (c *Client) AcceptJob(guid string) {
-	url := fmt.Sprintf("%s/jobs/%s/accept", c.BaseURL, guid)
+func (c *Client) ChangeJobState(guid string, state string) {
+	url := fmt.Sprintf("%s/jobs/%s/%s", c.BaseURL, guid, state)
 
 	req, _ := http.NewRequest(http.MethodPatch, url, nil)
 	req.Header.Set("Content-Type", "application/json")
+	log.Println("Remote: changing job state on " + url)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("ERROR: AcceptJob -", err)
+		log.Println("ERROR: ChangeJobState -", err)
 		return
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error: AcceptJob reading response -", err)
+		log.Println("Error: ChangeJobState reading response -", err)
 		return
 	}
 
-	log.Println("AcceptJob response: " + string(body))
-}
-
-// TODO: upload Result into the job
-func (c *Client) FinishedJob(guid string) {
-	url := fmt.Sprintf("%s/jobs/%s/finished", c.BaseURL, guid)
-
-	req, _ := http.NewRequest(http.MethodPatch, url, nil)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("ERROR: FinishedJob -", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println("Error: FinishedJob reading response -", err)
-		return
-	}
-
-	log.Println("FinishedJob response: " + string(body))
-}
-
-func (c *Client) FailedJob(guid string) {
-	url := fmt.Sprintf("%s/jobs/%s/failed", c.BaseURL, guid)
-
-	req, _ := http.NewRequest(http.MethodPatch, url, nil)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("ERROR: FailedJob -", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println("Error: FailedJob reading response -", err)
-		return
-	}
-
-	log.Println("FailedJob response: " + string(body))
+	log.Println("ChangeJobState response:", string(body))
 }
 
 func (c *Client) SendJobOutput(guid string, output []string) {
