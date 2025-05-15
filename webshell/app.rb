@@ -60,6 +60,14 @@ patch '/jobs/:guid/finished' do
   return json status: 'ok'
 end
 
+patch '/jobs/:guid/failed' do
+  job = available_jobs.detect { it[:guid] == params['guid']}
+  return json status: 'not_found' if job == nil
+
+  job[:status] = :failed
+  return json status: 'ok'
+end
+
 post '/jobs/:guid/output_log' do
   job = available_jobs.detect { it[:guid] == params['guid']}
   return json status: 'not_found' if job == nil

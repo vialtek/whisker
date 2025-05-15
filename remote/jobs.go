@@ -80,6 +80,29 @@ func (c *Client) FinishedJob(guid string) {
 	log.Println("FinishedJob response: " + string(body))
 }
 
+func (c *Client) FailedJob(guid string) {
+	url := fmt.Sprintf("%s/jobs/%s/failed", c.BaseURL, guid)
+
+	req, _ := http.NewRequest(http.MethodPatch, url, nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("ERROR: FailedJob -", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error: FailedJob reading response -", err)
+		return
+	}
+
+	log.Println("FailedJob response: " + string(body))
+}
+
 func (c *Client) SendJobOutput(guid string, output []string) {
 	url := fmt.Sprintf("%s/jobs/%s/output_log", c.BaseURL, guid)
 

@@ -69,9 +69,13 @@ func (s *NodeState) manageWorkload() {
 	client.AcceptJob(job.Guid)
 
 	result := s.executeJob(job)
-
-	client.FinishedJob(job.Guid)
 	client.SendJobOutput(job.Guid, result.Output)
+
+	if result.Success {
+		client.FinishedJob(job.Guid)
+	} else {
+		client.FailedJob(job.Guid)
+	}
 
 	s.Busy = false
 
