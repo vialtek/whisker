@@ -44,7 +44,7 @@ get '/jobs/:guid' do
   json job
 end
 
-get '/jobs/:guid/accept' do
+patch '/jobs/:guid/accept' do
   job = available_jobs.detect { it[:guid] == params['guid']}
   return json status: 'not_found' if job == nil
 
@@ -52,7 +52,7 @@ get '/jobs/:guid/accept' do
   return json status: 'ok'
 end
 
-get '/jobs/:guid/finished' do
+patch '/jobs/:guid/finished' do
   job = available_jobs.detect { it[:guid] == params['guid']}
   return json status: 'not_found' if job == nil
 

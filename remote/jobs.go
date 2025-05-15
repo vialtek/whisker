@@ -36,7 +36,11 @@ func (c *Client) AvailableJobs() []*model.Job {
 func (c *Client) AcceptJob(guid string) {
 	url := fmt.Sprintf("%s/jobs/%s/accept", c.BaseURL, guid)
 
-	resp, err := http.Get(url)
+	req, _ := http.NewRequest(http.MethodPatch, url, nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+  resp, err := client.Do(req)
 	if err != nil {
 		log.Println("ERROR: AcceptJob -", err)
 		return
@@ -56,7 +60,11 @@ func (c *Client) AcceptJob(guid string) {
 func (c *Client) FinishedJob(guid string) {
 	url := fmt.Sprintf("%s/jobs/%s/finished", c.BaseURL, guid)
 
-	resp, err := http.Get(url)
+	req, _ := http.NewRequest(http.MethodPatch, url, nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+  resp, err := client.Do(req)
 	if err != nil {
 		log.Println("ERROR: FinishedJob -", err)
 		return
