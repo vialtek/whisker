@@ -40,7 +40,7 @@ func (c *Client) AcceptJob(guid string) {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-  resp, err := client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("ERROR: AcceptJob -", err)
 		return
@@ -64,7 +64,7 @@ func (c *Client) FinishedJob(guid string) {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-  resp, err := client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("ERROR: FinishedJob -", err)
 		return
