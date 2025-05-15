@@ -52,6 +52,26 @@ func (c *Client) AcceptJob(guid string) {
 	log.Println("AcceptJob response: " + string(body))
 }
 
+// TODO: upload Result into the job
+func (c *Client) FinishedJob(guid string) {
+	url := fmt.Sprintf("%s/jobs/%s/finished", c.BaseURL, guid)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println("ERROR: FinishedJob -", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error: FinishedJob reading response -", err)
+		return
+	}
+
+	log.Println("FinishedJob response: " + string(body))
+}
+
 func (c *Client) SendJobOutput(guid string, output []string) {
 	url := fmt.Sprintf("%s/jobs/%s/output_log", c.BaseURL, guid)
 

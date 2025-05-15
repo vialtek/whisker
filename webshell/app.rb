@@ -52,6 +52,14 @@ get '/jobs/:guid/accept' do
   return json status: 'ok'
 end
 
+get '/jobs/:guid/finished' do
+  job = available_jobs.detect { it[:guid] == params['guid']}
+  return json status: 'not_found' if job == nil
+
+  job[:status] = :finished
+  return json status: 'ok'
+end
+
 post '/jobs/:guid/output_log' do
   job = available_jobs.detect { it[:guid] == params['guid']}
   return json status: 'not_found' if job == nil
