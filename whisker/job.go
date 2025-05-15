@@ -21,6 +21,10 @@ func (s *NodeState) pickNewJob() *model.Job {
 	client := remote.NewClient(GetConfig().JobServerURL)
 	jobs := client.AvailableJobs()
 
+	if len(jobs) > 0 {
+		log.Println("Picking new job, jobs available:", len(jobs))
+	}
+
 	// Finds first job that require workflow and dataset available on our node
 	for _, job := range jobs {
 		if s.workflowByName(job.Workflow) != nil && s.datasetByName(job.Dataset) != nil {

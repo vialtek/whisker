@@ -13,7 +13,6 @@ import (
 
 func (c *Client) AvailableJobs() []*model.Job {
 	url := c.BaseURL + "/jobs"
-	log.Println("Remote: get available jobs at " + url)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -29,7 +28,6 @@ func (c *Client) AvailableJobs() []*model.Job {
 		return nil
 	}
 
-	log.Println("Jobs in queue:", len(jobs))
 	return jobs
 }
 
