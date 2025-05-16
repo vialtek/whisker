@@ -13,18 +13,20 @@ import (
 var client *remote.Client
 
 type NodeState struct {
-	NodeName  string
-	Busy      bool
-	Workflows []*model.Workflow
-	Datasets  []*model.Dataset
+	NodeName   string
+	Busy       bool
+	CurrentJob *model.Job
+	Workflows  []*model.Workflow
+	Datasets   []*model.Dataset
 }
 
 func NewNode() *NodeState {
 	return &NodeState{
-		NodeName:  GetConfig().NodeName,
-		Busy:      false,
-		Workflows: loadWorkflows(),
-		Datasets:  loadDatasets(),
+		NodeName:   GetConfig().NodeName,
+		Busy:       false,
+		CurrentJob: nil,
+		Workflows:  loadWorkflows(),
+		Datasets:   loadDatasets(),
 	}
 }
 
@@ -62,21 +64,32 @@ func (s *NodeState) manageWorkload() {
 	}
 
 	// TODO: async
-	s.Busy = true
+	s.takeJob(job)
+	result := s.executeJob(job)
+	s.releaseCurrentJob(result)
+}
+
+func (s *NodeState) takeJob(job *model.Job) {
 	log.Println("Starting job:", job.Guid)
+
+	s.Busy = true
+	s.CurrentJob = job
 
 	client := remote.NewClient(GetConfig().JobServerURL)
 	client.ChangeJobState(job.Guid, "accept")
+}
 
-	result := s.executeJob(job)
-	client.SendJobOutput(job.Guid, result.Output)
+func (s *NodeState) releaseCurrentJob(result *Result) {
+	client := remote.NewClient(GetConfig().JobServerURL)
+	client.SendJobOutput(s.CurrentJob.Guid, result.Output)
 
 	if result.Success {
-		client.ChangeJobState(job.Guid, "finished")
+		client.ChangeJobState(s.CurrentJob.Guid, "finished")
 	} else {
-		client.ChangeJobState(job.Guid, "failed")
+		client.ChangeJobState(s.CurrentJob.Guid, "failed")
 	}
 
+	s.CurrentJob = nil
 	s.Busy = false
 
 	elapsed := result.EndedAt.Sub(result.StartedAt)
@@ -104,6 +117,13 @@ func (s *NodeState) Status() map[string]string {
 		}
 	}
 	result["datasets"] = strings.Join(datasetNames, ",")
+
+	if s.CurrentJob != nil {
+		job := s.CurrentJob
+		result["current_job_guid"] = job.Guid
+		result["current_job_workflow"] = job.Workflow
+		result["current_job_dataset"] = job.Dataset
+	}
 
 	return result
 }
