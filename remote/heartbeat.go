@@ -3,13 +3,14 @@ package remote
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 )
 
 func (c *Client) SendHeartbeat(status map[string]string) {
-	url := c.BaseURL + "/heartbeat"
+	url := fmt.Sprintf("%s/heartbeat", c.BaseURL)
 
 	log.Println("Remote: sending heartbeat to " + url)
 

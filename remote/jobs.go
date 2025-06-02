@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Client) AvailableJobs() []*model.Job {
-	url := c.BaseURL + "/jobs"
+	url := fmt.Sprintf("%s/jobs", c.BaseURL)
 
 	resp, err := http.Get(url)
 	if err != nil {
