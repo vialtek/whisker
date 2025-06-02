@@ -18,6 +18,7 @@ type NodeState struct {
 	CurrentJob *model.Job
 	Workflows  []*model.Workflow
 	Datasets   []*model.Dataset
+	Recipes    []*model.Recipe
 }
 
 func NewNode() *NodeState {
@@ -27,6 +28,7 @@ func NewNode() *NodeState {
 		CurrentJob: nil,
 		Workflows:  loadWorkflows(),
 		Datasets:   loadDatasets(),
+		Recipes:    loadRecipes(),
 	}
 }
 
