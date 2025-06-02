@@ -1,7 +1,11 @@
 package whisker
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/vialtek/whisker/model"
@@ -48,6 +52,16 @@ func (s *NodeState) executeJob(job *model.Job) *Result {
 		return result
 	}
 
+	err := prepareJobDir(job)
+	if err != nil {
+		result.Error = err.Error()
+		result.Success = false
+		result.EndedAt = time.Now()
+
+		log.Println(result.Error)
+		return result
+	}
+
 	for _, step := range workflow.Steps {
 		tokens := utils.TokenizeStep(step)
 
@@ -85,4 +99,30 @@ func (s *NodeState) executeJob(job *model.Job) *Result {
 	result.EndedAt = time.Now()
 
 	return result
+}
+
+func prepareJobDir(job *model.Job) error {
+	jobDir := filepath.Join(GetConfig().JobsDirPath, job.Guid)
+
+	// Directory already exists, remove it
+	if _, err := os.Stat(jobDir); err == nil {
+		if err := os.RemoveAll(jobDir); err != nil {
+			return fmt.Errorf("failed to remove directory %s: %w", jobDir, err)
+		}
+	}
+
+	if err := os.MkdirAll(jobDir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", jobDir, err)
+	}
+
+	// Exporting info to the directory
+	if job.Params != nil {
+		paramsData, _ := json.Marshal(job.Params)
+		fullPath := filepath.Join(jobDir, "params.json")
+		if err := os.WriteFile(fullPath, paramsData, 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", fullPath, err)
+		}
+	}
+
+	return nil
 }
