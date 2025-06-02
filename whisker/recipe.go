@@ -1,13 +1,58 @@
 package whisker
 
 import (
+	"bufio"
+	"fmt"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/vialtek/whisker/model"
 )
+
+func (s *NodeState) recipeByName(recipeName string) *model.Recipe {
+	for _, recipe := range s.Recipes {
+		if recipe.Name == recipeName {
+			return recipe
+		}
+	}
+
+	return nil
+}
+
+func execRecipe(recipe *model.Recipe, result *Result) {
+	var cmd *exec.Cmd
+	scriptPath := fmt.Sprintf("%s/%s", recipe.Pwd, recipe.Entrypoint)
+
+	cmd = exec.Command(recipe.Runner, scriptPath)
+
+	stderr, _ := cmd.StderrPipe()
+	stdout, _ := cmd.StdoutPipe()
+	cmd.Start()
+
+	scanner := bufio.NewScanner(stdout)
+	for scanner.Scan() {
+		m := scanner.Text()
+		log.Println(m)
+		result.Output = append(result.Output, m)
+	}
+
+	scannerErr := bufio.NewScanner(stderr)
+	for scannerErr.Scan() {
+		m := scannerErr.Text()
+		log.Println("Error:", m)
+		result.Output = append(result.Output, m)
+
+		// Job failed, abort.
+		result.Success = false
+		result.EndedAt = time.Now()
+	}
+
+	cmd.Wait()
+}
 
 func loadRecipes() []*model.Recipe {
 	var recipes []*model.Recipe
