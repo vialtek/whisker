@@ -34,12 +34,9 @@ func (c *Client) AvailableJobs() []*model.Job {
 func (c *Client) ChangeJobState(guid string, state string) {
 	url := fmt.Sprintf("%s/jobs/%s/%s", c.BaseURL, guid, state)
 
-	req, _ := http.NewRequest(http.MethodPatch, url, nil)
-	req.Header.Set("Content-Type", "application/json")
 	log.Println("Remote: changing job state on " + url)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		log.Println("ERROR: ChangeJobState -", err)
 		return
