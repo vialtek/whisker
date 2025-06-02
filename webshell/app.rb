@@ -12,10 +12,10 @@ available_jobs = [
     },
     {
       guid: SecureRandom.uuid.gsub('-','').downcase,
-      workflow: 'hello',
+      workflow: 'call-recipe',
       dataset: 'beer',
       status: :waiting
-    }
+    },
   ]
 
 get '/' do
@@ -34,6 +34,11 @@ get '/jobs' do
 end
 
 get '/jobs/all' do
+  json available_jobs
+end
+
+get '/jobs/refresh' do
+  available_jobs.each { it[:status] = :waiting }
   json available_jobs
 end
 
