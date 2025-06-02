@@ -1,0 +1,7 @@
+name: Call Recipe Workflow
+description: In this workflow we are going to call the recipe
+workflow: call-recipe
+steps:
+  - echo "Initiating recipe call..."
+  - run hello
+  - echo "Ending workflow."

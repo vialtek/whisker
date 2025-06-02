@@ -1,0 +1,3 @@
+name: hello
+runner: python3
+entrypoint: run.py
