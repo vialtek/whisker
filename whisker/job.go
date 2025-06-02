@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/vialtek/whisker/model"
-	"github.com/vialtek/whisker/remote"
 	"github.com/vialtek/whisker/utils"
 )
 
@@ -18,8 +17,7 @@ type Result struct {
 }
 
 func (s *NodeState) pickNewJob() *model.Job {
-	client := remote.NewClient(GetConfig().JobServerURL)
-	jobs := client.AvailableJobs()
+	jobs := GetClient().AvailableJobs()
 
 	if len(jobs) > 0 {
 		log.Println("Picking new job, jobs available:", len(jobs))

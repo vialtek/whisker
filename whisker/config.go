@@ -67,7 +67,7 @@ func defaultConfig() *model.Config {
 		DatasetDirPath:    "./examples/datasets",
 		RecipeDirPath:     "./examples/recipes",
 		JobServerURL:      "http://localhost:4567",
-		HeartbeatInterval: 60,
+		HeartbeatInterval: 1,
 		JobFetchInterval:  1,
 	}
 }

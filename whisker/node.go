@@ -10,8 +10,6 @@ import (
 	"github.com/vialtek/whisker/remote"
 )
 
-var client *remote.Client
-
 type NodeState struct {
 	NodeName   string
 	Busy       bool
@@ -32,11 +30,20 @@ func NewNode() *NodeState {
 	}
 }
 
+var clientInstance *remote.Client
+
+func GetClient() *remote.Client {
+	if clientInstance == nil {
+		clientInstance = remote.NewClient(GetConfig().JobServerURL)
+	}
+
+	return clientInstance
+}
+
 func (s *NodeState) Init() {
 	log.Println("Initializing Whisker...")
 
-	client := remote.NewClient(GetConfig().JobServerURL)
-	client.SendHeartbeat(s.Status())
+	GetClient().SendHeartbeat(s.Status())
 }
 
 func (s *NodeState) Run() {
@@ -50,7 +57,7 @@ func (s *NodeState) Run() {
 		case <-checkWorkTicker.C:
 			s.manageWorkload()
 		case <-heartbeatTicker.C:
-			client.SendHeartbeat(s.Status())
+			GetClient().SendHeartbeat(s.Status())
 		}
 	}
 }
@@ -77,18 +84,16 @@ func (s *NodeState) takeJob(job *model.Job) {
 	s.Busy = true
 	s.CurrentJob = job
 
-	client := remote.NewClient(GetConfig().JobServerURL)
-	client.ChangeJobState(job.Guid, "accept")
+	GetClient().ChangeJobState(job.Guid, "accept")
 }
 
 func (s *NodeState) releaseCurrentJob(result *Result) {
-	client := remote.NewClient(GetConfig().JobServerURL)
-	client.SendJobOutput(s.CurrentJob.Guid, result.Output)
+	GetClient().SendJobOutput(s.CurrentJob.Guid, result.Output)
 
 	if result.Success {
-		client.ChangeJobState(s.CurrentJob.Guid, "finished")
+		GetClient().ChangeJobState(s.CurrentJob.Guid, "finished")
 	} else {
-		client.ChangeJobState(s.CurrentJob.Guid, "failed")
+		GetClient().ChangeJobState(s.CurrentJob.Guid, "failed")
 	}
 
 	s.CurrentJob = nil
