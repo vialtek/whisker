@@ -67,6 +67,7 @@ func (s *NodeState) executeJob(job *model.Job) *Result {
 				return result
 			}
 
+			// TODO: should report failure
 			execRecipe(recipe, result)
 		} else {
 			errMsg := "Error: unsupported action in step: " + step

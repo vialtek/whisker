@@ -6,9 +6,20 @@ require 'sinatra/json'
 available_jobs = [
     {
       guid: SecureRandom.uuid.gsub('-','').downcase,
-      workflow: 'call-recipe',
+      workflow: 'hello',
       dataset: 'beer',
       status: :waiting
+    },
+    {
+      guid: SecureRandom.uuid.gsub('-','').downcase,
+      workflow: 'call-recipe',
+      dataset: 'beer',
+      status: :waiting,
+      params: {
+        targetVariable: 'Extract Concentration',
+        learningRate: 0.001
+
+      }
     },
   ]
 
