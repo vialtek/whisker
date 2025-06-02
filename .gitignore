@@ -12,5 +12,6 @@
 *.out
 
 bin/
+jobs_dir/
 
 .DS_Store

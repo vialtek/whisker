@@ -66,6 +66,7 @@ func defaultConfig() *model.Config {
 		WorkflowDirPath:   "./examples/workflows",
 		DatasetDirPath:    "./examples/datasets",
 		RecipeDirPath:     "./examples/recipes",
+		JobsDirPath:       "./jobs_dir",
 		JobServerURL:      "http://localhost:4567",
 		HeartbeatInterval: 60,
 		JobFetchInterval:  1,

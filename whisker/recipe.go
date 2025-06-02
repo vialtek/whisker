@@ -47,6 +47,7 @@ func execRecipe(recipe *model.Recipe, result *Result) {
 		result.Output = append(result.Output, m)
 
 		// Job failed, abort.
+		result.Error = m
 		result.Success = false
 		result.EndedAt = time.Now()
 	}
