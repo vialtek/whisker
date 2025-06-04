@@ -38,6 +38,7 @@ func (s *NodeState) pickNewJob() *model.Job {
 }
 
 func (s *NodeState) executeJob(job *model.Job) *Result {
+	s.Stats.JobsProcessed += 1
 	result := &Result{StartedAt: time.Now()}
 
 	workflow := s.workflowByName(job.Workflow)

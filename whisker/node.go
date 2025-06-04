@@ -10,6 +10,11 @@ import (
 	"github.com/vialtek/whisker/remote"
 )
 
+type RuntimeStats struct {
+	StartedAt     time.Time
+	JobsProcessed uint64
+}
+
 type NodeState struct {
 	NodeName   string
 	Busy       bool
@@ -17,6 +22,7 @@ type NodeState struct {
 	Workflows  []*model.Workflow
 	Datasets   []*model.Dataset
 	Recipes    []*model.Recipe
+	Stats      *RuntimeStats
 }
 
 func NewNode() *NodeState {
@@ -27,6 +33,7 @@ func NewNode() *NodeState {
 		Workflows:  loadWorkflows(),
 		Datasets:   loadDatasets(),
 		Recipes:    loadRecipes(),
+		Stats:      &RuntimeStats{StartedAt: time.Now()},
 	}
 }
 
@@ -108,6 +115,8 @@ func (s *NodeState) Status() map[string]string {
 
 	result["node_name"] = s.NodeName
 	result["busy"] = strconv.FormatBool(s.Busy)
+	result["jobs_processed"] = string(s.Stats.JobsProcessed)
+	result["uptime"] = strconv.FormatFloat(time.Since(s.Stats.StartedAt).Seconds(), 'f', 2, 64) //uptime in seconds
 
 	var workflowNames []string
 	for _, wf := range s.Workflows {
