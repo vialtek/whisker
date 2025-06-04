@@ -74,36 +74,27 @@ get '/jobs/:guid' do
   json job
 end
 
-post '/jobs/:guid/accept' do
-  job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job.nil?
-
-  job[:status] = :in_progress
-  return json status: 'ok'
-end
-
-post '/jobs/:guid/finished' do
-  job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job.nil?
-
-  job[:status] = :finished
-  return json status: 'ok'
-end
-
-post '/jobs/:guid/failed' do
-  job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job.nil?
-
-  job[:status] = :failed
-  return json status: 'ok'
-end
-
 post '/jobs/:guid/output_log' do
   job = available_jobs.detect { it[:guid] == params['guid']}
   return json status: 'not_found' if job.nil?
 
   params = JSON.parse(request.body.read, symbolize_names: true)
   job[:output_log] = params[:output_log]
+
+  return json status: 'ok'
+end
+
+AVAILABLE_JOB_STATES = [:accept, :finished, :failed]
+
+post '/jobs/:guid/:state' do
+  state = params[:state].to_sym
+  return json status: 'state_incorect' unless AVAILABLE_JOB_STATES.include? state
+
+  job = available_jobs.detect { it[:guid] == params['guid']}
+  return json status: 'not_found' if job.nil?
+
+  state = :in_progress if state == :accept
+  job[:status] = state
 
   return json status: 'ok'
 end
