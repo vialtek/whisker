@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 require 'sinatra/json'
 
+seen_nodes = []
 # Static Jobs as examples
 available_jobs = [
     {
@@ -23,12 +24,9 @@ available_jobs = [
     },
   ]
 
-seen_nodes = []
-
 get '/' do
   erb :index
 end
-
 
 get '/nodes' do
   json seen_nodes
@@ -85,7 +83,6 @@ post '/jobs/:guid/output_log' do
 end
 
 AVAILABLE_JOB_STATES = [:accept, :finished, :failed]
-
 post '/jobs/:guid/:state' do
   state = params[:state].to_sym
   return json status: 'state_incorect' unless AVAILABLE_JOB_STATES.include? state
