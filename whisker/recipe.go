@@ -23,7 +23,9 @@ func (s *NodeState) recipeByName(recipeName string) *model.Recipe {
 	return nil
 }
 
-func execRecipe(recipe *model.Recipe, result *Result) {
+func execRecipe(recipe *model.Recipe, result *Result) error {
+	runFailed := false
+
 	var cmd *exec.Cmd
 	scriptPath := fmt.Sprintf("%s/%s", recipe.Pwd, recipe.Entrypoint)
 
@@ -50,9 +52,15 @@ func execRecipe(recipe *model.Recipe, result *Result) {
 		result.Error = m
 		result.Success = false
 		result.EndedAt = time.Now()
+		runFailed = true
 	}
 
 	cmd.Wait()
+
+	if runFailed {
+		return fmt.Errorf("Execution of recipe %s failed: %s", recipe.Name, result.Error)
+	}
+	return nil
 }
 
 func loadRecipes() []*model.Recipe {
