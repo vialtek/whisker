@@ -115,8 +115,8 @@ func (s *NodeState) Status() map[string]string {
 
 	result["node_name"] = s.NodeName
 	result["busy"] = strconv.FormatBool(s.Busy)
-	result["jobs_processed"] = string(s.Stats.JobsProcessed)
-	result["uptime"] = strconv.FormatFloat(time.Since(s.Stats.StartedAt).Seconds(), 'f', 2, 64) //uptime in seconds
+	result["jobs_processed"] = strconv.FormatUint(s.Stats.JobsProcessed, 10)
+	result["uptime"] = strconv.FormatFloat(time.Since(s.Stats.StartedAt).Seconds(), 'f', 0, 64) //uptime in seconds
 
 	var workflowNames []string
 	for _, wf := range s.Workflows {

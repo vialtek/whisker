@@ -23,13 +23,33 @@ available_jobs = [
     },
   ]
 
+seen_nodes = []
+
 get '/' do
   erb :index
+end
+
+
+get '/nodes' do
+  json seen_nodes
 end
 
 post '/heartbeat' do
   params = JSON.parse(request.body.read, symbolize_names: true)
   puts params
+
+  node = seen_nodes.detect { it[:node_name] == params[:node_name] }
+  if node.nil?
+    node = {node_name: params[:node_name]}
+    seen_nodes.push node
+  end
+
+  node[:last_seen] = DateTime.now
+  node[:busy] = params[:busy] == 'true'
+  node[:datasets] = params[:datasets]
+  node[:workflows] = params[:workflows]
+  node[:jobs_processed] = params[:jobs_processed]
+  node[:uptime] = params[:uptime]
 
   json status: 'ok'
 end
@@ -49,14 +69,14 @@ end
 
 get '/jobs/:guid' do
   job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job == nil
+  return json status: 'not_found' if job.nil?
 
   json job
 end
 
 post '/jobs/:guid/accept' do
   job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job == nil
+  return json status: 'not_found' if job.nil?
 
   job[:status] = :in_progress
   return json status: 'ok'
@@ -64,7 +84,7 @@ end
 
 post '/jobs/:guid/finished' do
   job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job == nil
+  return json status: 'not_found' if job.nil?
 
   job[:status] = :finished
   return json status: 'ok'
@@ -72,7 +92,7 @@ end
 
 post '/jobs/:guid/failed' do
   job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job == nil
+  return json status: 'not_found' if job.nil?
 
   job[:status] = :failed
   return json status: 'ok'
@@ -80,7 +100,7 @@ end
 
 post '/jobs/:guid/output_log' do
   job = available_jobs.detect { it[:guid] == params['guid']}
-  return json status: 'not_found' if job == nil
+  return json status: 'not_found' if job.nil?
 
   params = JSON.parse(request.body.read, symbolize_names: true)
   job[:output_log] = params[:output_log]
