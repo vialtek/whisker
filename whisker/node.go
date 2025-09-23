@@ -4,6 +4,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/vialtek/whisker/model"
@@ -17,7 +18,7 @@ type RuntimeStats struct {
 
 type NodeState struct {
 	NodeName   string
-	Busy       bool
+	Busy       atomic.Bool
 	CurrentJob *model.Job
 	Workflows  []*model.Workflow
 	Datasets   []*model.Dataset
@@ -28,7 +29,6 @@ type NodeState struct {
 func NewNode() *NodeState {
 	return &NodeState{
 		NodeName:   GetConfig().NodeName,
-		Busy:       false,
 		CurrentJob: nil,
 		Workflows:  loadWorkflows(),
 		Datasets:   loadDatasets(),
@@ -70,7 +70,7 @@ func (s *NodeState) Run() {
 }
 
 func (s *NodeState) manageWorkload() {
-	if s.Busy {
+	if s.Busy.Load() {
 		return
 	}
 
@@ -79,16 +79,18 @@ func (s *NodeState) manageWorkload() {
 		return
 	}
 
-	// TODO: async
-	s.takeJob(job)
-	result := s.executeJob(job)
-	s.releaseCurrentJob(result)
+	go func() {
+        defer s.Busy.Store(false)
+        s.takeJob(job)
+        result := s.executeJob(job)
+        s.releaseCurrentJob(result)
+    }()
 }
 
 func (s *NodeState) takeJob(job *model.Job) {
 	log.Println("Starting job:", job.Guid)
 
-	s.Busy = true
+	s.Busy.Store(true)
 	s.CurrentJob = job
 
 	GetClient().ChangeJobState(job.Guid, "accept")
@@ -104,7 +106,7 @@ func (s *NodeState) releaseCurrentJob(result *Result) {
 	}
 
 	s.CurrentJob = nil
-	s.Busy = false
+	s.Busy.Store(false)
 
 	elapsed := result.EndedAt.Sub(result.StartedAt)
 	log.Println("Job ended. Elapsed time:", elapsed)
@@ -114,7 +116,7 @@ func (s *NodeState) Status() map[string]string {
 	result := make(map[string]string)
 
 	result["node_name"] = s.NodeName
-	result["busy"] = strconv.FormatBool(s.Busy)
+	result["busy"] = strconv.FormatBool(s.Busy.Load())
 	result["jobs_processed"] = strconv.FormatUint(s.Stats.JobsProcessed, 10)
 	result["uptime"] = strconv.FormatFloat(time.Since(s.Stats.StartedAt).Seconds(), 'f', 0, 64) //uptime in seconds
 
