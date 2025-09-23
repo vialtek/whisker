@@ -12,3 +12,6 @@ run:
 
 build:
 	go build -o $(BINARY_PATH) -v cmd/whisker/main.go
+
+clean: ## Remove all job temp files
+	rm -rf ./jobs_dir/*
